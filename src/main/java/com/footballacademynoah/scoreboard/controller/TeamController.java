@@ -64,7 +64,7 @@ public class TeamController {
     public ResponseEntity<Team> createTeam(@RequestBody Team team) {
       try {
         Team _team = teamRepository
-            .save(new Team(team.getName(), team.getCaptain(), team.isMensTournament()));
+            .save(new Team(team.getName(), team.getCaptain(), team.isMensTournament(), team.getTournament()));
         return new ResponseEntity<>(_team, HttpStatus.CREATED);
       } catch (Exception e) {
         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

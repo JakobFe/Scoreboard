@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "teams")
 public class Team {
@@ -23,6 +25,7 @@ public class Team {
 
     @ManyToOne
     @JoinColumn(name = "tournament", nullable = false)
+    @JsonBackReference
     private Tournament tournament;
 
     @OneToMany(mappedBy = "team1")
@@ -35,10 +38,11 @@ public class Team {
 
     }
 
-    public Team(String name, String captain, boolean mensTournament) {
+    public Team(String name, String captain, boolean mensTournament, Tournament tournament) {
         this.name = name;
         this.captain = captain;
         this.mensTournament = mensTournament;
+        this.tournament = tournament;
     }
 
     public long getId() {
@@ -67,6 +71,14 @@ public class Team {
 
     public void setMensTournament(boolean mensTournament) {
         this.mensTournament = mensTournament;
+    }
+    
+    public Tournament getTournament() {
+        return tournament;
+    }
+
+    public void setTournament(Tournament tournament) {
+        this.tournament = tournament;
     }
 
     public List<Game> getHomeGames() {

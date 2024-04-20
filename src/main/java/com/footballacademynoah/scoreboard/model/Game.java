@@ -1,5 +1,7 @@
 package com.footballacademynoah.scoreboard.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -16,10 +18,12 @@ public class Game {
 
     @ManyToOne
     @JoinColumn(name = "team1_id", nullable = false)
+    @JsonBackReference
     private Team team1;
 
     @ManyToOne
     @JoinColumn(name = "team2_id", nullable = false)
+    @JsonBackReference
     private Team team2;
 
     @Column(name = "team1Score")
