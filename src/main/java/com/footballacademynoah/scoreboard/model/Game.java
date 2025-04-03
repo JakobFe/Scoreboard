@@ -14,16 +14,17 @@ public class Game {
 
     @ManyToOne
     @JoinColumn(name = "tournament_id", nullable = false)
+    @JsonBackReference(value="tournament-games")
     private Tournament tournament;
 
     @ManyToOne
     @JoinColumn(name = "team1_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference(value="team-homeGames")
     private Team team1;
 
     @ManyToOne
     @JoinColumn(name = "team2_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference(value="team-awayGames")
     private Team team2;
 
     @Column(name = "team1Score")
@@ -38,6 +39,9 @@ public class Game {
     @Column(name = "date")
     private String date;
 
+    @Column(name = "time")
+    private String time;
+
     @Column(name = "field")
     private String field;
 
@@ -48,19 +52,40 @@ public class Game {
 
     }
 
-    public Game(Team team1, Team team2, int team1Score, int team2Score, String stage, String date, String field, boolean completed) {
+    public Game(
+        Team team1, 
+        Team team2, 
+        int team1Score, 
+        int team2Score, 
+        String stage, 
+        String date,
+        String time, 
+        String field, 
+        boolean completed,
+        Tournament tournament
+        ) {
         this.team1 = team1;
         this.team2 = team2;
         this.team1Score = team1Score;
         this.team2Score = team2Score;
         this.stage = stage;
         this.date = date;
+        this.time = time;
         this.field = field;
         this.completed = completed;
+        this.tournament = tournament;
     }
 
     public long getId() {
         return id;
+    }
+
+    public Tournament getTournament() {
+        return tournament;
+    }
+
+    public void setTournament(Tournament tournament) {
+        this.tournament = tournament;
     }
 
     public Team getTeam1() {
@@ -109,6 +134,14 @@ public class Game {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public String getField() {

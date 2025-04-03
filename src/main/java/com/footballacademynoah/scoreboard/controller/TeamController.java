@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.footballacademynoah.scoreboard.model.Team;
 import com.footballacademynoah.scoreboard.repository.TeamRepository;
 
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api")
 public class TeamController {

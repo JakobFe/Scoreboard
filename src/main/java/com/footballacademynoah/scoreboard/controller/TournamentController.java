@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.footballacademynoah.scoreboard.model.Tournament;
+import com.footballacademynoah.scoreboard.projection.GameProjection;
 import com.footballacademynoah.scoreboard.model.Team;
-import com.footballacademynoah.scoreboard.model.Game;
 import com.footballacademynoah.scoreboard.repository.TournamentRepository;
 import com.footballacademynoah.scoreboard.repository.GameRepository;
 
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api")
 public class TournamentController {
@@ -113,7 +113,7 @@ public class TournamentController {
   }
 
   @GetMapping("/tournaments/{id}/ranking")
-  public ResponseEntity<Map<String, Object>> getRankingById(long id) {
+  public ResponseEntity<Map<String, Object>> getRankingById(@PathVariable("id") long id) {
     Optional<Tournament> tournament = tournamentRepository.findById(id);
 
     if (tournament.isPresent()) {
@@ -123,18 +123,18 @@ public class TournamentController {
       Map<String, Object> ranking = new HashMap<String, Object>();
 
       for(Team team: teams) {
-        List<Game> home_games = gameRepository.findByTeam1(team);
-        List<Game> away_games = gameRepository.findByTeam2(team);
+        Optional<List<GameProjection>> home_games = gameRepository.findProjectedByTournamentAndTeam1(_tournament, team);
+        Optional<List<GameProjection>> away_games = gameRepository.findProjectedByTournamentAndTeam2(_tournament, team);
 
-        int total_for_home = home_games.stream().map(game -> game.getTeam1Score()).reduce(0, (a, b) -> a + b);
-        int total_for_away = away_games.stream().map(game -> game.getTeam2Score()).reduce(0, (a, b) -> a + b);
-        int total_against_home = home_games.stream().map(game -> game.getTeam2Score()).reduce(0, (a, b) -> a + b);
-        int total_against_away = away_games.stream().map(game -> game.getTeam1Score()).reduce(0, (a, b) -> a + b);
+        int total_for_home = home_games.orElse(new ArrayList<>()).stream().mapToInt(GameProjection::getTeam1Score).sum();
+        int total_against_home = home_games.orElse(new ArrayList<>()).stream().mapToInt(GameProjection::getTeam2Score).sum();
+        int total_for_away = away_games.orElse(new ArrayList<>()).stream().mapToInt(GameProjection::getTeam2Score).sum();
+        int total_against_away = away_games.orElse(new ArrayList<>()).stream().mapToInt(GameProjection::getTeam1Score).sum();
         int total_goals_for = total_for_home + total_for_away;
         int total_goals_against = total_against_home + total_against_away;
         int total_points = 0;
 
-        for(Game home_game: home_games){
+        for(GameProjection home_game: home_games.orElse(new ArrayList<>())){
           int score1 = home_game.getTeam1Score();
           int score2 = home_game.getTeam2Score();
 
@@ -145,7 +145,7 @@ public class TournamentController {
           }
         }
 
-        for(Game away_game: away_games){
+        for(GameProjection away_game: away_games.orElse(new ArrayList<>())){
           int score1 = away_game.getTeam1Score();
           int score2 = away_game.getTeam2Score();
 
@@ -158,7 +158,7 @@ public class TournamentController {
 
         Map<String, Object> info = new HashMap<String, Object>();
         info.put("total_points", total_points);
-        info.put("total_games", home_games.size() + away_games.size());
+        info.put("total_games", home_games.orElse(new ArrayList<>()).size() + away_games.orElse(new ArrayList<>()).size());
         info.put("total_goals_for", total_goals_for);
         info.put("total_goals_against", total_goals_against);
         info.put("total_goals", total_goals_for - total_goals_against);

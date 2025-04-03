@@ -25,13 +25,15 @@ public class Team {
 
     @ManyToOne
     @JoinColumn(name = "tournament", nullable = false)
-    @JsonBackReference
+    @JsonBackReference(value="tournament-teams")
     private Tournament tournament;
 
     @OneToMany(mappedBy = "team1")
+    @JsonBackReference(value="team-homeGames")
     private List<Game> homeGames;
 
     @OneToMany(mappedBy = "team2")
+    @JsonBackReference(value="team-awayGames")
     private List<Game> awayGames;
 
     public Team() {

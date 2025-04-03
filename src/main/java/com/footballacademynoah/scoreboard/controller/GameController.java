@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,42 +19,60 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.footballacademynoah.scoreboard.model.Game;
+import com.footballacademynoah.scoreboard.model.Tournament;
 import com.footballacademynoah.scoreboard.model.Team;
+import com.footballacademynoah.scoreboard.projection.GameProjection;
 import com.footballacademynoah.scoreboard.repository.GameRepository;
 
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api")
 public class GameController {
 
+    @Autowired
     GameRepository gameRepository;
 
     @GetMapping("/games")
-    public ResponseEntity<List<Game>> getAllGames(@RequestParam(required = false) String stage, @RequestParam(required = false) Team team) {
+    public ResponseEntity<List<GameProjection>> getAllGames(@RequestParam(required = true) Tournament tournament, @RequestParam(required = false) String stage, @RequestParam(required = false) Team team) {
         try {
-            List<Game> games = new ArrayList<Game>();
-
+            // Add null checks for tournament, stage, and team
             if (stage != null){
-              games.add(gameRepository.findByStage(stage));
-            } else if (team != null) {
-              gameRepository.findByTeam1(team).forEach(games::add);
-              gameRepository.findByTeam2(team).forEach(games::add);
-            } else {
-                gameRepository.findAll().forEach(games::add);
-            }
-
-            if (games.isEmpty()) {
+              Optional<List<GameProjection>> games = gameRepository.findProjectedByTournamentAndStage(tournament, stage);
+              
+              if (games.isPresent()) {
+                return new ResponseEntity<>(games.get(), HttpStatus.OK);
+              } else {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+              }
+            } else if (team != null) {
+              List<GameProjection> games = new ArrayList<GameProjection>();
+              Optional<List<GameProjection>> team1Games = gameRepository.findProjectedByTournamentAndTeam1(tournament, team);
+              team1Games.ifPresent(games::addAll);
+              Optional<List<GameProjection>> team2Games = gameRepository.findProjectedByTournamentAndTeam2(tournament, team);
+              team2Games.ifPresent(games::addAll);
+
+              if (!games.isEmpty()) {
+                return new ResponseEntity<>(games, HttpStatus.OK);
+              } else {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+              }
+            } else {
+              List<GameProjection> games = gameRepository.findAllProjectedByTournament(tournament);
+              
+              if (!games.isEmpty()) {
+                return new ResponseEntity<>(games, HttpStatus.OK);
+              } else {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+              }
             }
-            return new ResponseEntity<>(games, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/games/{id}")
-    public ResponseEntity<Game> getGameById(@PathVariable("id") long id) {
-      Optional<Game> gameData = gameRepository.findById(id);
+    public ResponseEntity<GameProjection> getGameById(@PathVariable("id") long id) {
+      Optional<GameProjection> gameData = gameRepository.findProjectedById(id);
   
       if (gameData.isPresent()) {
         return new ResponseEntity<>(gameData.get(), HttpStatus.OK);
@@ -73,11 +92,14 @@ public class GameController {
                     game.getTeam2Score(),
                     game.getStage(),
                     game.getDate(),
+                    game.getTime(),
                     game.getField(),
-                    game.isCompleted()
+                    game.isCompleted(),
+                    game.getTournament()
                 ));
         return new ResponseEntity<>(_game, HttpStatus.CREATED);
       } catch (Exception e) {
+        System.out.println("An error occurred while creating the game: " + e.getMessage());
         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
@@ -94,6 +116,7 @@ public class GameController {
         _game.setTeam2Score(game.getTeam2Score());
         _game.setStage(game.getStage());
         _game.setDate(game.getDate());
+        _game.setTime(game.getTime());
         _game.setField(game.getField());
         _game.setCompleted(game.isCompleted());
         return new ResponseEntity<>(gameRepository.save(_game), HttpStatus.OK);

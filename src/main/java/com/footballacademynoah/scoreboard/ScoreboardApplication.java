@@ -27,10 +27,10 @@ public class ScoreboardApplication {
 		return String.format("Hello %s!", name);
 	}
 
-	@GetMapping("/admin")
-	public ModelAndView admin(Model model) {
-		model.addAttribute("game", gameRepository.findByStage("test"));
-		return new ModelAndView("admin");
-	}
+	// @GetMapping("/admin")
+	// public ModelAndView admin(Model model) {
+	// 	model.addAttribute("game", gameRepository.findProjectedByTournamentAndStage("test"));
+	// 	return new ModelAndView("admin");
+	// }
 
 }

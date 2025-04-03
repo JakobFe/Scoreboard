@@ -18,11 +18,11 @@ public class Tournament {
     private String name;
 
     @OneToMany(mappedBy = "tournament")
-    @JsonManagedReference
+    @JsonManagedReference(value="tournament-teams")
     private List<Team> teams;
 
     @OneToMany(mappedBy = "tournament")
-    @JsonManagedReference
+    @JsonManagedReference(value="tournament-games")
     private List<Game> games;
 
     public Tournament() {
