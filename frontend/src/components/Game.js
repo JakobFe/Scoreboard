@@ -8,6 +8,7 @@ function Game({ homeTeam, awayTeam, homeScore, awayScore, field, time }) {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
+        marginBottom: 2,
       }}
     >
       <Box sx={{ textAlign: 'center', flex: 1 }}>
