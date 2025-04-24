@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime, timedelta
+import random
 
 BASE_URL = "http://localhost:8080/api"
 
@@ -22,7 +23,7 @@ def create_game(team1_id, team2_id, tournament_id, date, time, field):
         "team2": {"id": team2_id},
         "team1Score": 0,
         "team2Score": 0,
-        "stage": "Group Stage",
+        "stage": "POULE",
         "date": date,
         "time": time,
         "field": field,
@@ -31,12 +32,19 @@ def create_game(team1_id, team2_id, tournament_id, date, time, field):
     })
     return response.json()
 
+def complete_game(game_id, team1_score, team2_score):
+    response = requests.post(f"{BASE_URL}/games/{game_id}/complete", json={
+        "team1Score": team1_score,
+        "team2Score": team2_score
+    })
+    return response.json()
+
 def main():
     tournament = create_tournament("Champions League")
     tournament_id = tournament["id"]
 
     teams = []
-    for i in range(1, 5):
+    for i in range(1, 11):
         team = create_team(f"Team {i}", f"Captain {i}", True, tournament_id)
         teams.append(team)
 
@@ -51,6 +59,12 @@ def main():
             field = fields[game_index % len(fields)]
             create_game(teams[i]["id"], teams[j]["id"], tournament_id, date, time, field)
             game_index += 1
+    
+    # Simulate completing games with random scores
+    for game in range(game_index):
+        team1_score = random.randint(0, 5)
+        team2_score = random.randint(0, 5)
+        complete_game(game + 1, team1_score, team2_score)
 
 if __name__ == "__main__":
     main()

@@ -17,6 +17,10 @@ public class Tournament {
     @Column(name = "name")
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "stage")
+    private Stage stage;
+
     @OneToMany(mappedBy = "tournament")
     @JsonManagedReference(value="tournament-teams")
     private List<Team> teams;
@@ -43,6 +47,14 @@ public class Tournament {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 
     public List<Game> getGames() {

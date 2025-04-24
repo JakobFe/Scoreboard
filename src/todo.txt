@@ -1,0 +1,3 @@
+- Check if GameCompletion type is okey
+- Check the best way to use ENUM values for phase (POULE, QUARTER, HALF, FINAL)
+- Implement advanced exception handling and error responses in controller

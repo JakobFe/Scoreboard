@@ -1,12 +1,17 @@
 package com.footballacademynoah.scoreboard.projection;
 
+import com.footballacademynoah.scoreboard.model.Stage;
+
 public interface GameProjection {
     long getId();
     TeamInfo getTeam1();
     TeamInfo getTeam2();
     int getTeam1Score();
     int getTeam2Score();
-    String getStage();
+    int getTeam1Penalties();
+    int getTeam2Penalties();
+    Stage getStage();
+    String getSubStage();
     String getDate();
     String getTime();
     String getField();

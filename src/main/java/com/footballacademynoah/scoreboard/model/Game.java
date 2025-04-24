@@ -33,8 +33,18 @@ public class Game {
     @Column(name = "team2Score")
     private int team2Score;
 
+    @Column(name = "team1Penalties")
+    private int team1Penalties;
+
+    @Column(name = "team2Penalties")
+    private int team2Penalties;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "stage")
-    public String stage;
+    public Stage stage;
+
+    @Column(name = "substage")
+    public String substage;
 
     @Column(name = "date")
     private String date;
@@ -56,8 +66,10 @@ public class Game {
         Team team1, 
         Team team2, 
         int team1Score, 
-        int team2Score, 
-        String stage, 
+        int team2Score,
+        int team1Penalties,
+        int team2Penalties,
+        Stage stage, 
         String date,
         String time, 
         String field, 
@@ -68,6 +80,8 @@ public class Game {
         this.team2 = team2;
         this.team1Score = team1Score;
         this.team2Score = team2Score;
+        this.team1Penalties = team1Penalties;
+        this.team2Penalties = team2Penalties;
         this.stage = stage;
         this.date = date;
         this.time = time;
@@ -120,12 +134,36 @@ public class Game {
         this.team2Score = team2Score;
     }
 
-    public String getStage() {
+    public int getTeam1Penalties() {
+        return team1Penalties;
+    }
+
+    public void setTeam1Penalties(int team1Penalties) {
+        this.team1Penalties = team1Penalties;
+    }
+
+    public int getTeam2Penalties() {
+        return team2Penalties;
+    }
+
+    public void setTeam2Penalties(int team2Penalties) {
+        this.team2Penalties = team2Penalties;
+    }
+
+    public Stage getStage() {
         return stage;
     }
 
-    public void setStage(String stage) {
+    public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    public String getSubStage() {
+        return substage;
+    }
+
+    public void setSubStage(String substage) {
+        this.substage = substage;
     }
 
     public String getDate() {

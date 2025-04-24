@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.footballacademynoah.scoreboard.model.Game;
+import com.footballacademynoah.scoreboard.model.GameCompletion;
+import com.footballacademynoah.scoreboard.model.Stage;
 import com.footballacademynoah.scoreboard.model.Tournament;
 import com.footballacademynoah.scoreboard.model.Team;
 import com.footballacademynoah.scoreboard.projection.GameProjection;
@@ -33,7 +35,7 @@ public class GameController {
     GameRepository gameRepository;
 
     @GetMapping("/games")
-    public ResponseEntity<List<GameProjection>> getAllGames(@RequestParam(required = true) Tournament tournament, @RequestParam(required = false) String stage, @RequestParam(required = false) Team team) {
+    public ResponseEntity<List<GameProjection>> getAllGames(@RequestParam(required = true) Tournament tournament, @RequestParam(required = false) Stage stage, @RequestParam(required = false) Team team) {
         try {
             // Add null checks for tournament, stage, and team
             if (stage != null){
@@ -90,6 +92,8 @@ public class GameController {
                     game.getTeam2(),
                     game.getTeam1Score(),
                     game.getTeam2Score(),
+                    game.getTeam1Penalties(),
+                    game.getTeam2Penalties(),
                     game.getStage(),
                     game.getDate(),
                     game.getTime(),
@@ -119,6 +123,21 @@ public class GameController {
         _game.setTime(game.getTime());
         _game.setField(game.getField());
         _game.setCompleted(game.isCompleted());
+        return new ResponseEntity<>(gameRepository.save(_game), HttpStatus.OK);
+      } else {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+    }
+
+    @PostMapping("/games/{id}/complete")
+    public ResponseEntity<Game> completeGame(@PathVariable("id") long id, @RequestBody GameCompletion result) {
+      Optional<Game> gameData = gameRepository.findById(id);
+
+      if (gameData.isPresent()) {
+        Game _game = gameData.get();
+        _game.setTeam1Score(result.getTeam1Score());
+        _game.setTeam2Score(result.getTeam2Score());
+        _game.setCompleted(true);
         return new ResponseEntity<>(gameRepository.save(_game), HttpStatus.OK);
       } else {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
